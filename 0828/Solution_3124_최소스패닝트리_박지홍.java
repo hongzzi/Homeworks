@@ -1,99 +1,100 @@
 package algo_지홍;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+import java.util.Arrays;
+import java.util.Scanner;
 
-public class Solution_3124_최소스패닝트리_박지홍 {
+public class Solution_1251_하나로_박지홍{
+    public static class Edge implements Comparable<Edge> {
+		int a;
+		int b;
+		int val;
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st;
-        int T = Integer.parseInt(br.readLine());
-         
-        for (int t = 1; t <= T; t++) {
-            int V = Integer.parseInt(br.readLine());
-             
-            int[][] ads = new int[V][2];
-             
-            st = new StringTokenizer(br.readLine());
-             
-            int idx = 0;
-             
-            while(st.hasMoreTokens()) {
-                ads[idx++][1] = Integer.parseInt(st.nextToken());
-            }
-             
-            st = new StringTokenizer(br.readLine());
-             
-            idx = 0;
-            while (st.hasMoreTokens()) {
-                ads[idx++][0] = Integer.parseInt(st.nextToken());
-            }
-         
-            long[][] G = new long[V][V];
-             
-            double e = Double.parseDouble(br.readLine());
- 
-            for (int i = 0; i < V; i++) {
-                for (int j = 0; j < ads.length; j++) {
-                    long val = (long)(ads[i][1] - ads[j][1]) * (ads[i][1] - ads[j][1])
-                            + (long)(ads[i][0] - ads[j][0]) * (ads[i][0] - ads[j][0]); 
-                    G[i][j] = val;
-                    G[j][i] = val; 
-                }
-            }
-             
-            int[] p = new int[G.length];
-            long[] val = new long[G.length];
-             
-             
-            boolean[] selected = new boolean[V];
-             
-            int r = 0; 
-             
-            for (int i = 0; i < selected.length; i++) {
-                if(G[r][i] > 0) {
-                    val[i]=G[r][i];
-                    p[i] = r;
-                }else {
-                    val[i] = Long.MAX_VALUE;
-                }
-            }
-            val[r] = 0; 
-            p[r]=r; 
-            selected[r] = true;
-             
-            for (int i = 1; i < V; i++) {
-                int minIndex = -1;  
-                long min = Long.MAX_VALUE; 
-                 
-                for (int j = 0; j < val.length; j++) {
-                    if(!selected[j] && min > val[j]) {
-                        min = val[j];
-                        minIndex = j;
-                    }
-                }
-                 
-                r = minIndex;
-                selected[r] = true;
-                 
-                for (int j = 0; j < G[r].length; j++) {
-                    if(!selected[j] && G[r][j]!=0 && val[j] > G[r][j]) {
-                        val[j]=G[r][j];
-                        p[j] = r;
-                    }
-                }
-            }
-             
-            double MST = 0;
-            for (int i = 0; i < val.length; i++) {
-                MST += val[i];
-            }
-             
-            MST *= e;
-            System.out.println("#"+t+" "+ Math.round(MST));
-        }
-    }
-}
+		public Edge(int a, int b, int val) {
+			this.a = a - 1;
+			this.b = b - 1;
+			this.val = val;
+		}
+
+		public String toString() {
+			return "[" + a + "," + b + "," + val + "]";
+		}
+
+		@Override
+		public int compareTo(Edge o) { 
+			return this.val - o.val;
+		}
+
+	}
+
+	static int[] p; 
+	static int[] rank;
+
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int T = sc.nextInt();
+
+		for (int testCase = 1; testCase <= T; testCase++) {
+			  int V = sc.nextInt();
+		      int E = sc.nextInt(); 
+		      
+		      Edge[] G = new Edge[E];
+		      for (int i = 0; i < E; i++) {
+		         G[i] = new Edge(sc.nextInt(), sc.nextInt(), sc.nextInt());
+		      }
+		      Arrays.sort(G); 
+		      p = new int[V];  
+              rank = new int[V]; 
+		      for (int i = 0; i < V; i++) {
+		         makeSet(i);
+              }
+		      long MST = 0; 
+		      int cnt = 0;
+		      for (int i = 0; i < E; i++) {
+		         Edge e = G[i]; 
+		         int px = findSet(e.a); 
+		         int py = findSet(e.b);
+		         if(px!=py) { 
+		            union(px,py);
+		            MST += e.val;
+		            cnt++;
+		            if(cnt==V-1) {
+		               break;
+		            }
+		         }
+		      }
+		      System.out.println("#"+testCase+" "+MST);
+		
+		}	      
+	}
+	public static int findSet(int x) {
+		if (p[x] == x) { 
+			return x;
+		} else {
+			p[x] = findSet(p[x]);
+			return p[x];
+		}
+	}
+	public static void union(int x, int y) {
+		int px = findSet(x);
+		int py = findSet(y);
+		if (px != py) {
+			link(px, py);
+		}
+	}
+
+	public static void link(int px, int py) {
+		if (rank[px] > rank[py]) {
+			p[py] = px; 
+		} else {
+			p[px] = p[py];
+			if (rank[px] == rank[py])
+				rank[py]++;
+		}
+	}
+
+	public static void makeSet(int x) {
+		p[x] = x;
+		rank[x] = 0;
+	}
+
+} 
