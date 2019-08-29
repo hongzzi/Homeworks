@@ -3,7 +3,7 @@ package algo_지홍;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class Solution_1251_하나로_박지홍{
+public class Solution_3124_최소스패닝트리_박지홍{
     public static class Edge implements Comparable<Edge> {
 		int a;
 		int b;
